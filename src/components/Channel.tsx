@@ -19,7 +19,7 @@ const Channel: React.FC = () => {
   }, []);
 
   return (
-    <Box w="100%" mt={16}>
+    <Box w="100%" mt={16} pb={16}>
       <VStack justifyContent="flex-end" p={3}>
         {messages.map((message: any, index: number) => (
           <Message
