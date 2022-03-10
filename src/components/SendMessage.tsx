@@ -13,8 +13,9 @@ import {
 } from '@chakra-ui/react';
 import { GrSend } from 'react-icons/gr';
 
-const SendMessage = () => {
+const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
   const [message, setMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { colorMode } = useColorMode();
 
@@ -40,14 +41,23 @@ const SendMessage = () => {
     if (auth.currentUser) {
       const { uid, photoURL } = auth.currentUser;
 
-      await addDoc(collection(db, 'messages'), {
-        text: message,
-        photoURL,
-        uid,
-        createdAt: serverTimestamp()
-      });
+      try {
+        setIsLoading(true);
+        await addDoc(collection(db, 'messages'), {
+          text: message,
+          photoURL,
+          uid,
+          createdAt: serverTimestamp()
+        });
 
-      setMessage('');
+        setMessage('');
+
+        scrollTo.current.scrollIntoView({ behavior: 'smooth' });
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        throw error;
+      }
     }
   };
 
@@ -70,6 +80,7 @@ const SendMessage = () => {
           value={message}
         />
         <IconButton
+          isLoading={isLoading}
           size="lg"
           icon={<GrSend />}
           aria-label="Send"
