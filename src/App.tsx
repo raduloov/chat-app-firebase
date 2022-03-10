@@ -1,38 +1,49 @@
-import * as React from "react"
+import { useState } from 'react';
+import { initializeApp } from 'firebase/app';
+import { onAuthStateChanged } from 'firebase/auth';
+import { firebaseConfig, auth } from './config/firebase-config';
+
 import {
   ChakraProvider,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
   theme,
-} from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Logo } from "./Logo"
+  useDisclosure,
+  useMediaQuery
+} from '@chakra-ui/react';
+import Navigation from './layout/Navigation';
+import Login from './components/Login';
+import Menu from './components/Menu';
+import Channel from './components/Channel';
+import Layout from './layout/Layout';
 
-export const App = () => (
-  <ChakraProvider theme={theme}>
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
-          <Text>
-            Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
-          </Text>
-          <Link
-            color="teal.500"
-            href="https://chakra-ui.com"
-            fontSize="2xl"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn Chakra
-          </Link>
-        </VStack>
-      </Grid>
-    </Box>
-  </ChakraProvider>
-)
+initializeApp(firebaseConfig);
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  const [isBigScreen] = useMediaQuery('(min-width: 750px)');
+
+  console.log(isBigScreen);
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  });
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return (
+    <ChakraProvider theme={theme}>
+      {!isLoggedIn && <Login />}
+      <Menu isOpen={isOpen} onClose={onClose} />
+
+      <Layout onShowMenu={onOpen}>
+        <Channel />
+      </Layout>
+    </ChakraProvider>
+  );
+};
+
+export default App;
