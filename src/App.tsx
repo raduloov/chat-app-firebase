@@ -22,8 +22,6 @@ const App = () => {
 
   const [isBigScreen] = useMediaQuery('(min-width: 750px)');
 
-  console.log(isBigScreen);
-
   onAuthStateChanged(auth, user => {
     if (user) {
       setIsLoggedIn(true);
@@ -38,10 +36,11 @@ const App = () => {
     <ChakraProvider theme={theme}>
       {!isLoggedIn && <Login />}
       <Menu isOpen={isOpen} onClose={onClose} />
-
-      <Layout onShowMenu={onOpen}>
-        <Channel />
-      </Layout>
+      {isLoggedIn && (
+        <Layout onShowMenu={onOpen}>
+          <Channel />
+        </Layout>
+      )}
     </ChakraProvider>
   );
 };
