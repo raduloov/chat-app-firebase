@@ -18,6 +18,8 @@ const Channel: React.FC = () => {
     onSnapshot(dataOrdered, snapshot => {
       setMessages(snapshot.docs.map(doc => doc.data()));
     });
+
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   return (
