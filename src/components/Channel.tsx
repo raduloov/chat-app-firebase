@@ -24,7 +24,7 @@ const Channel: React.FC = () => {
 
   return (
     <Box w="100%" mt={16} pb={16}>
-      <Stack justifyContent="flex-end" p={3} h="100vh">
+      <Stack justifyContent="flex-end" minH="100vh" p={3}>
         {messages.map((message: any, index: number) => (
           <Message
             key={index}
