@@ -1,21 +1,23 @@
 import { FormEvent, useState } from 'react';
 import { db, auth } from '../config/firebase-config';
-import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 import {
   IconButton,
   Input,
   Flex,
   useToast,
-  Container,
   useColorMode,
   Box
 } from '@chakra-ui/react';
 import { GrSend } from 'react-icons/gr';
+import { useParams } from 'react-router-dom';
 
 const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { userId } = useParams();
 
   const { colorMode } = useColorMode();
 
@@ -43,12 +45,20 @@ const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
 
       try {
         setIsLoading(true);
-        await addDoc(collection(db, 'messages'), {
-          text: message,
-          photoURL,
-          uid,
-          createdAt: Timestamp.fromDate(new Date())
-        });
+        await addDoc(
+          collection(
+            db,
+            userId && userId < auth.currentUser.uid
+              ? `${userId}${auth.currentUser.uid}`
+              : `${auth.currentUser.uid}${userId}`
+          ),
+          {
+            text: message,
+            photoURL,
+            uid,
+            createdAt: Timestamp.fromDate(new Date())
+          }
+        );
 
         setMessage('');
 

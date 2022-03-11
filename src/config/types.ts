@@ -1,3 +1,8 @@
+export interface LayoutType {
+  isLoggedIn: boolean;
+  onShowMenu: () => void;
+}
+
 export interface MessageType {
   text: string;
   photoURL: string;
