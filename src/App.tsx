@@ -32,7 +32,10 @@ const App = () => {
         <Menu isOpen={isOpen} onClose={onClose} />
         <Layout isLoggedIn={isLoggedIn} onShowMenu={onOpen}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={!isLoggedIn ? <Navigate to="/login" /> : <Home />}
+            />
             <Route
               path="/login"
               element={isLoggedIn ? <Navigate to="/" /> : <Login />}
