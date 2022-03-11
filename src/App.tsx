@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Menu from './components/Menu';
 import Channel from './pages/Chat';
 import Layout from './layout/Layout';
+import Home from './pages/Home';
 
 initializeApp(firebaseConfig);
 
@@ -31,7 +32,7 @@ const App = () => {
         <Menu isOpen={isOpen} onClose={onClose} />
         <Layout isLoggedIn={isLoggedIn} onShowMenu={onOpen}>
           <Routes>
-            <Route path="/" element={<Channel />} />
+            <Route path="/" element={<Home />} />
             <Route
               path="/login"
               element={isLoggedIn ? <Navigate to="/" /> : <Login />}

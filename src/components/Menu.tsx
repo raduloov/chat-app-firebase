@@ -11,15 +11,20 @@ import {
   VStack,
   Heading
 } from '@chakra-ui/react';
-import { db, auth } from '../config/firebase-config';
+import { db } from '../config/firebase-config';
 import { getAuth, signOut } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
-import { FiLogOut, FiUsers } from 'react-icons/fi';
+import { FiLogOut } from 'react-icons/fi';
 import { User } from './User';
 
-const Menu: React.FC<{ isOpen: any; onClose: any }> = ({ isOpen, onClose }) => {
+interface MenuProps {
+  isOpen: any;
+  onClose: any;
+}
+
+const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
   const [users, setUsers] = useState<any>([]);
 
   const auth = getAuth();
