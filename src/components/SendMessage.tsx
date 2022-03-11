@@ -11,13 +11,15 @@ import {
   Box
 } from '@chakra-ui/react';
 import { GrSend } from 'react-icons/gr';
-import { useParams } from 'react-router-dom';
 
-const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
+interface SendMessageProps {
+  scrollTo: any;
+  chatId: string;
+}
+
+const SendMessage: React.FC<SendMessageProps> = ({ scrollTo, chatId }) => {
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const { userId } = useParams();
 
   const { colorMode } = useColorMode();
 
@@ -40,25 +42,17 @@ const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
       return;
     }
 
-    if (auth.currentUser) {
+    if (auth.currentUser && chatId) {
       const { uid, photoURL } = auth.currentUser;
 
       try {
         setIsLoading(true);
-        await addDoc(
-          collection(
-            db,
-            userId && userId < auth.currentUser.uid
-              ? `${userId}${auth.currentUser.uid}`
-              : `${auth.currentUser.uid}${userId}`
-          ),
-          {
-            text: message,
-            photoURL,
-            uid,
-            createdAt: Timestamp.fromDate(new Date())
-          }
-        );
+        await addDoc(collection(db, chatId), {
+          text: message,
+          photoURL,
+          uid,
+          createdAt: Timestamp.fromDate(new Date())
+        });
 
         setMessage('');
 

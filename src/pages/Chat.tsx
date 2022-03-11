@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { collection, orderBy, query, limit, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../config/firebase-config';
 
-import { Stack, Box, Text, Flex, Icon } from '@chakra-ui/react';
+import { Stack, Box, Text, Flex } from '@chakra-ui/react';
 import { FaRegComments } from 'react-icons/fa';
 import { MessageType } from '../config/types';
 import SendMessage from '../components/SendMessage';
@@ -46,16 +46,18 @@ const Chat: React.FC = () => {
   }
 
   useEffect(() => {
-    const collectionRef = collection(db, chatId);
-    const dataOrdered = query(collectionRef, orderBy('createdAt'), limit(100));
+    if (chatId) {
+      const collectionRef = collection(db, chatId);
+      const dataOrdered = query(collectionRef, orderBy('createdAt'), limit(100));
 
-    const unsubscribe = onSnapshot(dataOrdered, snapshot => {
-      setMessages(snapshot.docs.map(doc => doc.data()));
-    });
+      const unsubscribe = onSnapshot(dataOrdered, snapshot => {
+        setMessages(snapshot.docs.map(doc => doc.data()));
+      });
 
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+      scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    }
   }, [chatId]);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const Chat: React.FC = () => {
             />
           ))}
         </Stack>
-        <SendMessage scrollTo={scrollRef} />
+        <SendMessage scrollTo={scrollRef} chatId={chatId} />
       </Box>
       <div ref={scrollRef}></div>
     </>
