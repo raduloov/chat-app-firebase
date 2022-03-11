@@ -3,6 +3,7 @@ import { collection, orderBy, query, limit, onSnapshot } from 'firebase/firestor
 import { db } from '../config/firebase-config';
 
 import { Stack, VStack, Box } from '@chakra-ui/react';
+import { MessageType } from '../config/types';
 import SendMessage from './SendMessage';
 import Message from './Message';
 
@@ -19,9 +20,7 @@ const Channel: React.FC = () => {
       setMessages(snapshot.docs.map(doc => doc.data()));
     });
 
-    // if (messages.length > 0) {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-    // }
   }, []);
 
   useEffect(() => {
@@ -32,12 +31,13 @@ const Channel: React.FC = () => {
     <>
       <Box w="100%" mt={16} pb={16}>
         <Stack justifyContent="flex-end" minH="100vh" p={3}>
-          {messages.map((message: any, index: number) => (
+          {messages.map((message: MessageType, index: number) => (
             <Message
               key={index}
               text={message.text}
               photoURL={message.photoURL}
-              userId={message.uid}
+              uid={message.uid}
+              createdAt={message.createdAt}
             />
           ))}
         </Stack>

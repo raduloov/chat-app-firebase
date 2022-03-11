@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { db, auth } from '../config/firebase-config';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 import {
   IconButton,
@@ -47,7 +47,7 @@ const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
           text: message,
           photoURL,
           uid,
-          createdAt: serverTimestamp()
+          createdAt: Timestamp.fromDate(new Date())
         });
 
         setMessage('');
@@ -76,7 +76,9 @@ const SendMessage: React.FC<{ scrollTo: any }> = ({ scrollTo }) => {
           variant="filled"
           placeholder="Message..."
           borderEndRadius={0}
-          onChange={event => setMessage(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setMessage(event.target.value)
+          }
           value={message}
         />
         <IconButton
