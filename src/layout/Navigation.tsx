@@ -1,4 +1,6 @@
-import { getAuth } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../config/firebase-config';
 
 import {
   HStack,
@@ -9,12 +11,33 @@ import {
   useColorMode
 } from '@chakra-ui/react';
 import { FiMenu } from 'react-icons/fi';
+import { MdNotificationsActive } from 'react-icons/md';
 
-const Navigation: React.FC<{ onShowMenu: () => void }> = ({ onShowMenu }) => {
+const Navigation: React.FC<{
+  onShowMenu: () => void;
+}> = ({ onShowMenu }) => {
+  const [data, setData] = useState<any>();
+
   const { colorMode } = useColorMode();
 
-  const auth = getAuth();
   const userImage = auth.currentUser?.photoURL;
+
+  let showNotification = false;
+  useEffect(() => {
+    const collectionRef = collection(db, 'lastMessage');
+
+    const unsubscribe = onSnapshot(collectionRef, snapshot => {
+      setData(snapshot.docs.map(doc => doc.data()));
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (data) {
+    showNotification = data.some(
+      (msg: any) => msg.unread && msg.to === auth.currentUser?.uid
+    );
+  }
 
   return (
     <HStack
@@ -27,12 +50,16 @@ const Navigation: React.FC<{ onShowMenu: () => void }> = ({ onShowMenu }) => {
     >
       <IconButton
         size="lg"
-        icon={<FiMenu />}
+        icon={showNotification ? <MdNotificationsActive /> : <FiMenu />}
         aria-label="Menu"
         isRound={true}
         variant="ghost"
+        bgColor={showNotification ? 'green.500' : ''}
         onClick={onShowMenu}
-      />
+      >
+        {showNotification ? <MdNotificationsActive /> : undefined}
+      </IconButton>
+
       <Spacer />
       <Heading bgGradient="linear(to-r, pink.500, pink.300, blue.500)" bgClip="text">
         Chat App

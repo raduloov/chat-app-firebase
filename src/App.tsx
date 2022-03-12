@@ -3,11 +3,12 @@ import { initializeApp } from 'firebase/app';
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebaseConfig, auth } from './config/firebase-config';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ChakraProvider, useDisclosure } from '@chakra-ui/react';
 
-import { ChakraProvider, theme, useDisclosure } from '@chakra-ui/react';
+import theme from './config/theme';
 import Login from './pages/Login';
 import Menu from './components/Menu';
-import Channel from './pages/Chat';
+import Chat from './pages/Chat';
 import Layout from './layout/Layout';
 import Home from './pages/Home';
 
@@ -15,6 +16,7 @@ initializeApp(firebaseConfig);
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [notification, setNotification] = useState<boolean | null>(null);
 
   onAuthStateChanged(auth, user => {
     if (user) {
@@ -25,6 +27,10 @@ const App = () => {
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const sendNotification = (notification: any) => {
+    setNotification(notification);
+  };
 
   return (
     <ChakraProvider theme={theme}>
@@ -40,7 +46,16 @@ const App = () => {
               path="/login"
               element={isLoggedIn ? <Navigate to="/" /> : <Login />}
             />
-            <Route path="/chat/:userId" element={<Channel />} />
+            <Route
+              path="/chat/:userId"
+              element={
+                !isLoggedIn ? (
+                  <Navigate to="/login" />
+                ) : (
+                  <Chat sendNotification={sendNotification} />
+                )
+              }
+            />
           </Routes>
         </Layout>
       </BrowserRouter>

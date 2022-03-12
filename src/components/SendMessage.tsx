@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { db, auth } from '../config/firebase-config';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc, Timestamp } from 'firebase/firestore';
 
 import {
   IconButton,
@@ -15,9 +15,10 @@ import { GrSend } from 'react-icons/gr';
 interface SendMessageProps {
   scrollTo: any;
   chatId: string;
+  userId: string;
 }
 
-const SendMessage: React.FC<SendMessageProps> = ({ scrollTo, chatId }) => {
+const SendMessage: React.FC<SendMessageProps> = ({ scrollTo, chatId, userId }) => {
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -51,7 +52,17 @@ const SendMessage: React.FC<SendMessageProps> = ({ scrollTo, chatId }) => {
           text: message,
           photoURL,
           uid,
+          to: userId && userId,
           createdAt: Timestamp.fromDate(new Date())
+        });
+
+        await setDoc(doc(db, 'lastMessage', chatId), {
+          text: message,
+          photoURL,
+          uid,
+          to: userId && userId,
+          createdAt: Timestamp.fromDate(new Date()),
+          unread: true
         });
 
         setMessage('');

@@ -1,11 +1,14 @@
-import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { onSnapshot, doc } from 'firebase/firestore';
+import { db } from '../config/firebase-config';
+import { Box, Button, Image, Text } from '@chakra-ui/react';
 
 interface UserProps {
   uid: string;
   displayName: string;
   email: string;
   photoURL: string;
+  user1: any;
   openChat: (uid: string) => void;
 }
 
@@ -14,8 +17,28 @@ export const User: React.FC<UserProps> = ({
   displayName,
   email,
   photoURL,
+  user1,
   openChat
 }) => {
+  const [data, setData] = useState<any>();
+
+  useEffect(() => {
+    let chatId: string;
+    if (uid === 'groupChat') {
+      chatId = 'messages';
+    } else if (uid < user1) {
+      chatId = `${uid}${user1}`;
+    } else {
+      chatId = `${user1}${uid}`;
+    }
+
+    const unsubscribe = onSnapshot(doc(db, 'lastMessage', chatId), doc => {
+      setData(doc.data());
+    });
+
+    return () => unsubscribe();
+  }, [uid, user1]);
+
   return (
     <Button
       onClick={() => openChat(uid)}
@@ -36,7 +59,14 @@ export const User: React.FC<UserProps> = ({
         alignItems="flex-start"
       >
         <Text fontSize="lg">{displayName}</Text>
-        <Text isTruncated>{email}</Text>
+        <Text fontSize="sm" isTruncated>
+          {email}
+        </Text>
+        {data && data.uid !== user1 && data.unread && (
+          <Text bgColor="green.400" p={1} rounded="lg" mt={1}>
+            New Unread Messages
+          </Text>
+        )}
       </Box>
     </Button>
   );

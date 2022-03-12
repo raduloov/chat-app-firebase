@@ -1,5 +1,5 @@
 import { auth } from '../config/firebase-config';
-import { color, Flex, Image, SlideFade, Text, useColorMode } from '@chakra-ui/react';
+import { Flex, Image, SlideFade, Text, useColorMode } from '@chakra-ui/react';
 import { MessageType } from '../config/types';
 
 const Message: React.FC<MessageType> = ({ text, photoURL, uid, createdAt }) => {
@@ -36,19 +36,17 @@ const Message: React.FC<MessageType> = ({ text, photoURL, uid, createdAt }) => {
       );
 
       if (hours < 1) {
-        return minutes < 1 ? 'now' : `${minutes} mins ago`;
+        return minutes < 1
+          ? 'now'
+          : `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
       }
 
       return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
     }
 
-    let hours: string | number = dateCreated.getHours();
-    let minutes: string | number = dateCreated.getMinutes();
+    const formattedDate = dateCreated.toLocaleDateString('en-GB');
 
-    hours = hours < 10 ? `0${hours}` : hours;
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-
-    return `${hours}:${minutes}`;
+    return `${formattedDate}`;
   };
 
   return (

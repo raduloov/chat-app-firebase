@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { collection, orderBy, query, limit, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  orderBy,
+  query,
+  limit,
+  onSnapshot,
+  getDoc,
+  doc,
+  updateDoc
+} from 'firebase/firestore';
 import { auth, db } from '../config/firebase-config';
 
 import { Stack, Box, Text, Flex } from '@chakra-ui/react';
@@ -9,9 +18,14 @@ import SendMessage from '../components/SendMessage';
 import Message from '../components/Message';
 import { useParams } from 'react-router-dom';
 
-const Chat: React.FC = () => {
+interface ChatProps {
+  sendNotification: (notif: any) => void;
+}
+
+const Chat: React.FC<ChatProps> = ({ sendNotification }) => {
   const [messages, setMessages] = useState<any>([]);
   const [userDisplayName, setUserDisplayName] = useState<string>('');
+  const [notification, setNotification] = useState<boolean | null>(null);
 
   const { userId } = useParams();
 
@@ -61,6 +75,27 @@ const Chat: React.FC = () => {
   }, [chatId]);
 
   useEffect(() => {
+    const readMessage = async () => {
+      const docSnap = await getDoc(doc(db, 'lastMessage', chatId));
+      const lastMessage = docSnap.data();
+
+      if (
+        (lastMessage && lastMessage.uid !== auth.currentUser?.uid) ||
+        (lastMessage && lastMessage.uid === userId)
+      ) {
+        await updateDoc(doc(db, 'lastMessage', chatId), {
+          unread: false
+        });
+        setNotification(false);
+
+        sendNotification(notification);
+      }
+    };
+
+    readMessage();
+  }, [chatId, userId, sendNotification, notification]);
+
+  useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -96,7 +131,7 @@ const Chat: React.FC = () => {
             />
           ))}
         </Stack>
-        <SendMessage scrollTo={scrollRef} chatId={chatId} />
+        <SendMessage scrollTo={scrollRef} chatId={chatId} userId={userId ?? ''} />
       </Box>
       <div ref={scrollRef}></div>
     </>

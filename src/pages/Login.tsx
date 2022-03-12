@@ -1,24 +1,19 @@
 import { useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
-import { db } from '../config/firebase-config';
-import { doc, setDoc, onSnapshot, addDoc, collection } from 'firebase/firestore';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth, db } from '../config/firebase-config';
+import { onSnapshot, addDoc, collection } from 'firebase/firestore';
 
-import { VStack, Heading, Button, Stack } from '@chakra-ui/react';
+import { VStack, Heading, Button, Stack, useToast } from '@chakra-ui/react';
 import { FaGoogle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const auth = getAuth();
-
+  const toast = useToast();
   const navigate = useNavigate();
 
   const loginWithGoogleHandler = async () => {
-    // if (error !== '') {
-    //   setError('');
-    // }
-
     setIsLoading(true);
 
     try {
@@ -56,16 +51,24 @@ const Login = () => {
       return navigate('/');
     } catch (error) {
       setIsLoading(false);
+      toast({
+        title: 'Something went wrong!',
+        description: 'Please try again later.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true
+      });
       throw error;
     }
   };
 
   return (
     <VStack textAlign="center" justifyContent="center" alignItems="center" h="100vh">
-      <Stack mb={20}>
+      <Stack mb={16}>
         <Heading>Welcome to</Heading>
         <Heading
           size="3xl"
+          pb={3}
           bgGradient="linear(to-r, pink.500, pink.300, blue.500)"
           bgClip="text"
         >
