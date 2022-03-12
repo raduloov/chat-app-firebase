@@ -39,6 +39,8 @@ export const User: React.FC<UserProps> = ({
     return () => unsubscribe();
   }, [uid, user1]);
 
+  const showNotification = data && data.uid !== user1 && data.unread;
+
   return (
     <Button
       onClick={() => openChat(uid)}
@@ -47,9 +49,10 @@ export const User: React.FC<UserProps> = ({
       display="flex"
       justifyContent="flex-start"
       borderWidth={2}
+      borderColor={showNotification ? 'green.400' : ''}
       rounded="2xl"
       py={10}
-      bgColor="rgba(0,0,0,0.15)"
+      bgColor={showNotification ? 'rgba(72, 187, 120, 0.15)' : 'rgba(0,0,0,0.15)'}
     >
       <Image src={photoURL} rounded="full" h={14} mr={2} />
       <Box
@@ -62,9 +65,9 @@ export const User: React.FC<UserProps> = ({
         <Text fontSize="sm" isTruncated>
           {email}
         </Text>
-        {data && data.uid !== user1 && data.unread && (
+        {showNotification && (
           <Text bgColor="green.400" p={1} rounded="lg" mt={1}>
-            New Unread Messages
+            Unread Messages
           </Text>
         )}
       </Box>
